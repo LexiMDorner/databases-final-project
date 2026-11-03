@@ -1,3 +1,5 @@
+DROP DATABASE IF EXISTS finalProject;
+
 -- MySQL Workbench Forward Engineering
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -44,7 +46,8 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `finalProject`.`course` (
   `course_id` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(100) NULL,
-  PRIMARY KEY (`course_id`))
+  `section` INT NOT NULL,
+  PRIMARY KEY (`course_id`, `section`))
 ENGINE = InnoDB;
 
 
@@ -54,16 +57,17 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `finalProject`.`teaches` (
   `teacher_id` INT NOT NULL,
   `course_id` INT NOT NULL,
-  PRIMARY KEY (`teacher_id`, `course_id`),
-  INDEX `course_fk_3_idx` (`course_id` ASC) VISIBLE,
-  CONSTRAINT `teacher_fk_2`
+  `section` INT NOT NULL,
+  PRIMARY KEY (`teacher_id`, `course_id`, `section`),
+  INDEX `course_fk_3_idx` (`course_id` ASC, `section` ASC) VISIBLE,
+  CONSTRAINT `teacher_fk_1`
     FOREIGN KEY (`teacher_id`)
     REFERENCES `finalProject`.`teacher` (`teacher_id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  CONSTRAINT `course_fk_3`
-    FOREIGN KEY (`course_id`)
-    REFERENCES `finalProject`.`course` (`course_id`)
+  CONSTRAINT `course_fk_1`
+    FOREIGN KEY (`course_id` , `section`)
+    REFERENCES `finalProject`.`course` (`course_id` , `section`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -75,16 +79,17 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `finalProject`.`enrollment` (
   `student_id` INT NOT NULL,
   `course_id` INT NOT NULL,
-  PRIMARY KEY (`student_id`, `course_id`),
-  INDEX `course_fk_3_idx` (`course_id` ASC) VISIBLE,
-  CONSTRAINT `student_fk_3`
+  `section` INT NOT NULL,
+  PRIMARY KEY (`student_id`, `course_id`, `section`),
+  INDEX `course_fk_3_idx` (`course_id` ASC, `section` ASC) VISIBLE,
+  CONSTRAINT `student_fk_1`
     FOREIGN KEY (`student_id`)
     REFERENCES `finalProject`.`student` (`student_id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `course_fk_3`
-    FOREIGN KEY (`course_id`)
-    REFERENCES `finalProject`.`course` (`course_id`)
+  CONSTRAINT `course_fk_2`
+    FOREIGN KEY (`course_id` , `section`)
+    REFERENCES `finalProject`.`course` (`course_id` , `section`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
 ENGINE = InnoDB;
@@ -109,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `finalProject`.`question` (
   `question_text` VARCHAR(300) NULL,
   PRIMARY KEY (`question_id`),
   INDEX `quiz_fk_1_idx` (`quiz_id` ASC) VISIBLE,
-  CONSTRAINT `quiz_fk_1`
+  CONSTRAINT `quiz_fk_2`
     FOREIGN KEY (`quiz_id`)
     REFERENCES `finalProject`.`quiz` (`quiz_id`)
     ON DELETE RESTRICT
@@ -139,14 +144,15 @@ ENGINE = InnoDB;
 -- Table `finalProject`.`group`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `finalProject`.`group` (
-  `group_id` INT NOT NULL,
+  `group_id` INT NOT NULL AUTO_INCREMENT,
   `group_name` VARCHAR(100) NULL,
   `course_id` INT NULL,
+  `section` INT NULL,
   PRIMARY KEY (`group_id`),
-  INDEX `course_fk_2_idx` (`course_id` ASC) VISIBLE,
-  CONSTRAINT `course_fk_2`
-    FOREIGN KEY (`course_id`)
-    REFERENCES `finalProject`.`course` (`course_id`)
+  INDEX `course_fk_2_idx` (`course_id` ASC, `section` ASC) VISIBLE,
+  CONSTRAINT `course_fk_3`
+    FOREIGN KEY (`course_id` , `section`)
+    REFERENCES `finalProject`.`course` (`course_id` , `section`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -160,13 +166,13 @@ CREATE TABLE IF NOT EXISTS `finalProject`.`group_quiz` (
   `quiz_id` INT NOT NULL,
   `score` INT NULL,
   PRIMARY KEY (`group_id`, `quiz_id`),
-  INDEX `quiz_fk_2_idx` (`quiz_id` ASC) VISIBLE,
-  CONSTRAINT `quiz_fk_2`
+  INDEX `group_quiz_quiz_idx` (`quiz_id` ASC) VISIBLE,
+  CONSTRAINT `group_quiz_quiz_fk`
     FOREIGN KEY (`quiz_id`)
     REFERENCES `finalProject`.`quiz` (`quiz_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `group_fk_2`
+  CONSTRAINT `group_quiz_group_fk`
     FOREIGN KEY (`group_id`)
     REFERENCES `finalProject`.`group` (`group_id`)
     ON DELETE NO ACTION
@@ -180,14 +186,16 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `finalProject`.`class_quiz` (
   `course_id` INT NOT NULL,
   `quiz_id` INT NOT NULL,
-  PRIMARY KEY (`course_id`, `quiz_id`),
-  INDEX `quiz_fk_3_idx` (`quiz_id` ASC) VISIBLE,
+  `section` INT NOT NULL,
+  PRIMARY KEY (`course_id`, `quiz_id`, `section`),
+  INDEX `class_quiz_quiz_idx` (`quiz_id` ASC) VISIBLE,
+  INDEX `course_fk_4_idx` (`course_id` ASC, `section` ASC) VISIBLE,
   CONSTRAINT `course_fk_4`
-    FOREIGN KEY (`course_id`)
-    REFERENCES `finalProject`.`course` (`course_id`)
+    FOREIGN KEY (`course_id` , `section`)
+    REFERENCES `finalProject`.`course` (`course_id` , `section`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  CONSTRAINT `quiz_fk_3`
+  CONSTRAINT `class_quiz_quiz_fk`
     FOREIGN KEY (`quiz_id`)
     REFERENCES `finalProject`.`quiz` (`quiz_id`)
     ON DELETE CASCADE
@@ -201,14 +209,15 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `finalProject`.`student_group` (
   `group_id` INT NOT NULL,
   `student_id` INT NOT NULL,
+  `end_date` DATETIME NULL,
   PRIMARY KEY (`group_id`, `student_id`),
   INDEX `student_fk_1_idx` (`student_id` ASC) VISIBLE,
-  CONSTRAINT `group_fk_1`
+  CONSTRAINT `student_group_group_fk`
     FOREIGN KEY (`group_id`)
     REFERENCES `finalProject`.`group` (`group_id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE,
-  CONSTRAINT `student_fk_1`
+  CONSTRAINT `student_fk_2`
     FOREIGN KEY (`student_id`)
     REFERENCES `finalProject`.`student` (`student_id`)
     ON DELETE CASCADE
