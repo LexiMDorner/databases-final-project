@@ -1,5 +1,6 @@
 SELECT
     s.student_name,
+    g.section,
     g.group_name,
     q.quiz_name,
     gq.score
@@ -10,6 +11,7 @@ FROM
     JOIN group_quiz gq ON g.group_id = gq.group_id
     JOIN quiz q ON gq.quiz_id = q.quiz_id
 ORDER BY
+    g.section,
     q.quiz_name,
     g.group_name,
     s.student_name;

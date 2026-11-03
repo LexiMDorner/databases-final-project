@@ -7,16 +7,18 @@ VALUES
     ('Prof. Jordan Lee', 'jordan.lee@example.com');
 
 INSERT INTO
-    course (title, section)
+    course (course_id, title, section)
 VALUES
-    ('Introduction to Biology', 1),
-    ('World History', 1),
-    ('Computer Science Fundamentals', 1);
+    (1, 'Introduction to Biology', 1),
+    (1, 'Introduction to Biology', 2),
+    (2, 'World History', 1),
+    (3, 'Computer Science Fundamentals', 1);
 
 INSERT INTO
     teaches (teacher_id, course_id, section)
 VALUES
     (1, 1, 1),
+    (1, 1, 2),
     (1, 2, 1),
     (2, 3, 1);
 
@@ -51,7 +53,7 @@ VALUES
     ('Zach Adams', 'zach.adams@example.com'),
     ('Nora Baker', 'nora.baker@example.com');
 
--- Course 1: students 1-9
+-- Course 1, section 1: students 1-9
 INSERT INTO
     enrollment (student_id, course_id, section)
 VALUES
@@ -64,6 +66,20 @@ VALUES
     (7, 1, 1),
     (8, 1, 1),
     (9, 1, 1);
+
+-- Course 1, section 2: students 10-18
+INSERT INTO
+    enrollment (student_id, course_id, section)
+VALUES
+    (10, 1, 2),
+    (11, 1, 2),
+    (12, 1, 2),
+    (13, 1, 2),
+    (14, 1, 2),
+    (15, 1, 2),
+    (16, 1, 2),
+    (17, 1, 2),
+    (18, 1, 2);
 
 -- Course 2: students 10-18
 INSERT INTO
@@ -100,6 +116,9 @@ VALUES
     ('Biology Group A', 1, 1),
     ('Biology Group B', 1, 1),
     ('Biology Group C', 1, 1),
+    ('Biology Group A', 1, 2),
+    ('Biology Group B', 1, 2),
+    ('Biology Group C', 1, 2),
     ('History Group A', 2, 1),
     ('History Group B', 2, 1),
     ('History Group C', 2, 1),
@@ -186,11 +205,16 @@ VALUES
 INSERT INTO
     class_quiz (course_id, quiz_id, section)
 VALUES
-    (1, 1, 1);
+    (1, 1, 1),
+    (1, 1, 2);
 
+-- Assign the quiz to every group in the Biology course.
 INSERT INTO
     group_quiz (group_id, quiz_id, score)
 VALUES
     (1, 1, 10),
     (2, 1, 5),
-    (3, 1, 12);
+    (3, 1, 12),
+    (4, 1, 8),
+    (5, 1, 7),
+    (6, 1, 6);
